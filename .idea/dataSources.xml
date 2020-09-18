@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="Django default" uuid="41d52025-774e-46c5-be05-60c8e8d7d5ba">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/djangorest/settings.py</remarks>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\kenda\PycharmProjects\djangorest\db.sqlite3</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="beskalem.sqlite3" uuid="5a544c66-66f5-44c9-99c2-5613f991a0ee">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/beskalem.sqlite3</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="iz.sqlite3" uuid="c7b47c09-5f98-4a9c-9e6b-7a7e70c79c41">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/iz.sqlite3</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Django iz" uuid="7d7ca190-efe3-4ee5-8920-e64e4b307059">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/djangorest/settings.py</remarks>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\kenda\PycharmProjects\djangorest\iz.sqlite3</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Django beskalem" uuid="a5d41c77-1346-4327-9d00-90e576eadfe2">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <imported>true</imported>
+      <remarks>$PROJECT_DIR$/djangorest/settings.py</remarks>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\kenda\PycharmProjects\djangorest\beskalem.sqlite3</jdbc-url>
+    </data-source>
+  </component>
+</project>
