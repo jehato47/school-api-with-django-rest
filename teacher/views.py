@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from djangorest.permission import Issuperuser, Isstaff
+from djangorest.permission import *
 from .models import *
 from management.models import Etüt
 from management.serializer import EtudeSerializer
@@ -32,7 +32,7 @@ def registerTeacher(request):
         data = request.data
         data = dict(data)
         for i in data:
-            data[i] = data[i][0]
+            data[i] = data[i][0] or None
 
         data["etüt_saatleri"] = str(data["etüt_saatleri"])
         serializer = TeacherSerializer(data=data, context={"request": request})
@@ -134,12 +134,17 @@ def dersegöreöğretmenal(request, ders):
 # >----- Ders Programı -----<
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, HaveData])
 def dersprogramıekle(request):
     data = request.data
     u = request.user
     id = data["user"]
     t = Öğretmen.objects.using(u.email).filter(user_id=id).first()
+    if not t:
+        return Response({"success": False,
+                         "error": "Böyle bir öğretmen yok la"},
+                        status=status.HTTP_404_NOT_FOUND)
+
     data["ders"] = t.ders
     data["öğretmen"] = t.get_full_name()
 

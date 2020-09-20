@@ -36,7 +36,7 @@ def duyuruoluştur(request):
     data = dict(request.data)
     data["oluşturan"] = u.get_full_name()
     data["içerik"] = data["içerik"][0]
-    data["dosya"] = data["dosya"][0]
+    data["dosya"] = data["dosya"][0] or None
 
     serializer = NoticeSerializer(data=data, context={"request": request})
     if serializer.is_valid():

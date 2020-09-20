@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from student.models import Öğrenci
+from management.serializer import EtudeSerializer
 from student.serializer import StudentSerializer
 from teacher.serializer import TeacherSerializer
 from teacher.models import Öğretmen
@@ -13,12 +14,13 @@ from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from djangorest.permission import Issuperuser, Isstaff
+from datetime import *
 from django.utils import timezone
-import locale
-locale.setlocale(locale.LC_TIME, "tr")
+
+liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
+e_date = (datetime.today() - timedelta(days=datetime.today().weekday() % 7)).date()
 
 
-# Content.objects.filter(name="baby").first()  obje veya None almak için güzel yöntem
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -40,6 +42,13 @@ def userInfo(request):
             serializer = TeacherSerializer(u, context={"request": request})
             data = serializer.data
             data["etüt_saatleri"] = eval(data["etüt_saatleri"])
+            e = u.user.etüt_set.filter(user_id=u.user_id, date=e_date).last()
+            if e:
+                e = EtudeSerializer(e).data
+                k = dict()
+                k.update({item: eval(e[item]) for item in liste})
+                data["etüt_saatleri"] = k
+                data["date"] = e["date"]
 
         else:
             u = Öğrenci.objects.using(user.email).filter(user_id=user.id).first()
@@ -103,28 +112,32 @@ def searchuser(request):
     öğretmenmi = int(request.GET.get("t"))
     yöneticimi = int(request.GET.get("a"))
 
-    # u = User.objects.filter(username=data["username"]).first()
     if yöneticimi:
         m = Yönetici.objects.using(request.user.email).filter(isim__contains=keyword)
         serializer = YöneticiSerializer(m, many=True)
         data = serializer.data
     elif öğretmenmi:
         m = Öğretmen.objects.using(request.user.email).filter(isim__contains=keyword, user__email=request.user.email)
+
         serializer = TeacherSerializer(m, many=True, context={"request": request})
         data = serializer.data
-        for i in data:
+
+        for i, j in list(zip(data, m)):
             i["etüt_saatleri"] = eval(i["etüt_saatleri"])
+            e = j.user.etüt_set.filter(user_id=i["user"], date=e_date).last()
+            if e:
+                e = EtudeSerializer(e).data
+                k = dict()
+                k.update({item: eval(e[item]) for item in liste})
+                i["etüt_saatleri"] = k
+                i["date"] = e["date"]
     else:
         m = Öğrenci.objects.using(request.user.email).filter(isim__contains=keyword)
         serializer = StudentSerializer(m, many=True)
         data = serializer.data
 
-    # liste = []
-    # for i in serializer.data:
-    #     x = dict(i)
-    #
-    #     x["username"] = User.objects.get(id=x["user"]).username
-    #     liste.append(x)
+    for i in data:
+        i["username"] = User.objects.get(id=i["user"]).username
 
     return Response(data)
 
@@ -144,10 +157,3 @@ def deleteUser(request):
                         "user_id": id, "username": u.username}, status=status.HTTP_204_NO_CONTENT)
     else:
         return Response({"success": False, "error": "Böyle bir kullanıcı yok"})
-
-
-# from rest_framework.authtoken.models import Token
-# from django.contrib.auth.models import User
-# serializer = StudentSerializer(s, data=data)
-
-# u = User.objects.filter(first_name__contains="je")

@@ -27,7 +27,8 @@ def registerStudent(request):
         data = request.data
         data = dict(data)
         for i in data:
-            data[i] = data[i][0]
+            data[i] = data[i][0] or None
+
 
         serializer = StudentSerializer(data=data)
         s = AccountSerializer(data=data)

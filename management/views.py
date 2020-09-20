@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from djangorest.permission import Issuperuser, Isstaff
+from djangorest.permission import *
 from datetime import *
 from .models import *
 from teacher.models import *
@@ -51,8 +51,14 @@ def yoklama(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated, Isstaff])
 def yoklamayıal(request, d, ders, no):
+
     x = date(*list(map(int, d.split("-"))))
     y = Yoklama.objects.using(request.user.email).filter(date=x, ders=ders, sınıf=no).first()
+    if not y:
+        return Response({"success": False,
+                         "error": "Bugüne ve derse ait yoklama bulunamadı"},
+                        status=status.HTTP_404_NOT_FOUND)
+
     serializer = AttendanceSerializer(y)
 
     data = serializer.data
@@ -238,10 +244,13 @@ def etütal(request, id):
 # >----- Ödev -----<
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated, Isstaff])
+@permission_classes([HaveData, IsAuthenticated, Isstaff])
 def ödev_oluştur(request):
     u = request.user
     t = Öğretmen.objects.using(u.email).filter(user_id=u.id).first()
+    if not t:
+        return Response({"success": False, "error": "Böyle bir öğretmen yok"},
+                        status=status.HTTP_404_NOT_FOUND)
     data = request.data
     data["ders"] = t.ders
     data["öğretmen"] = u.get_full_name()
