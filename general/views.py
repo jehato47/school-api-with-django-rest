@@ -16,8 +16,8 @@ from student.models import Öğrenci
 from twilio.rest import Client
 from django.core.files.uploadedfile import TemporaryUploadedFile
 
-account_sid = "AC20941e58f2e5ba23d8ab26dbf26f3697"
-auth_token = "0c31727cff04a3a6655ddea8e23e8e67"
+account_sid = "**********"
+auth_token = "*********"
 client = Client(account_sid, auth_token)
 liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
 
