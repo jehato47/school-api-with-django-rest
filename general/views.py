@@ -1,7 +1,4 @@
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from teacher.serializer import TeacherSerializer
 from .serializer import *
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -9,16 +6,18 @@ from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from djangorest.permission import Issuperuser, Isstaff
-from datetime import *
 from .models import *
-from teacher.models import *
 from student.models import Öğrenci
 from twilio.rest import Client
-from django.core.files.uploadedfile import TemporaryUploadedFile
+import os
+from twilio.rest import Client
+from twilio.http.http_client import TwilioHttpClient
 
-account_sid = "**********"
-auth_token = "*********"
-client = Client(account_sid, auth_token)
+account_sid = os.environ.get("ACCOUNT_SID")
+auth_token = os.environ.get("AUTH_TOKEN")
+# proxy_client = TwilioHttpClient(proxy={'http': os.environ['http_proxy'], 'https': os.environ['https_proxy']})
+# client = Client(account_sid, auth_token, http_client=proxy_client)
+
 liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
 
 
@@ -34,9 +33,9 @@ def index(request):
 def duyuruoluştur(request):
     u = request.user
     data = dict(request.data)
+    for i in data:
+        data[i] = data[i][0] or None
     data["oluşturan"] = u.get_full_name()
-    data["içerik"] = data["içerik"][0]
-    data["dosya"] = data["dosya"][0] or None
 
     serializer = NoticeSerializer(data=data, context={"request": request})
     if serializer.is_valid():
@@ -48,8 +47,8 @@ def duyuruoluştur(request):
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def duyurularıal(request):
-    duyurular = Duyuru.objects.using(request.user.email).all().order_by("tarih")
+def genelduyurularıal(request, to):
+    duyurular = Duyuru.objects.using(request.user.email).filter(to=to).order_by("tarih")
     serializer = NoticeSerializer(duyurular, many=True)
     return Response(serializer.data)
 
@@ -84,6 +83,7 @@ def dosyaları_sil(request, id):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def mesaj_gönder(request, no, t):
+    client = Client(account_sid, auth_token)
     s = Öğrenci.objects.using(request.user.email).filter(no=no).first()
     if not s:
         return Response({"success": False, "error": "Böyle bir öğrenci yok"},
@@ -112,6 +112,7 @@ def mesaj_gönder(request, no, t):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def özelmesajgönder(request, t):
+    client = Client(account_sid, auth_token)
     data = request.data
     to = data["to"]
     body = data["body"]

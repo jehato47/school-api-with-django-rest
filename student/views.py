@@ -1,12 +1,11 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from .models import Öğrenci
 from teacher.serializer import *
 from accountancy.serializer import AccountSerializer
 from .serializer import *
-from teacher.models import *
+# from teacher.models import *
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
@@ -23,53 +22,51 @@ liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated, Issuperuser])
 def registerStudent(request):
-    try:
-        data = request.data
-        data = dict(data)
-        for i in data:
-            data[i] = data[i][0] or None
+    data = request.data
+    data = dict(data)
+    for i in data:
+        data[i] = data[i][0] or None
 
+    serializer = StudentSerializer(data=data)
+    s = AccountSerializer(data=data)
+    s1 = Öğrenci.objects.using(request.user.email).filter(no=data["no"]).first()
+    data["user"] = 1
 
-        serializer = StudentSerializer(data=data)
-        s = AccountSerializer(data=data)
-        s1 = Öğrenci.objects.using(request.user.email).filter(no=data["no"]).first()
-        data["user"] = 1
-
-        # Burası çok güzel
-        if serializer.is_valid() and s.is_valid() and not s1:
-            pass
+    # Burası çok güzel
+    if serializer.is_valid() and s.is_valid() and not s1:
+        pass
+    else:
+        if serializer.errors:
+            err = serializer.errors
+        elif s.errors:
+            err = s.errors
         else:
-            if serializer.errors:
-                err = serializer.errors
-            elif s.errors:
-                err = s.errors
-            else:
-                err = {"no": ["Bu numaraya sahip bir öğrenci zaten var"]}
-            return Response(err, status=status.HTTP_400_BAD_REQUEST)
+            err = {"no": ["Bu numaraya sahip bir öğrenci zaten var"]}
+        return Response(err, status=status.HTTP_400_BAD_REQUEST)
 
-        u = User(username=data["username"],
-                 first_name=data["isim"],
-                 last_name=data["soyisim"],
-                 email=request.user.email)
+    u = User(username=data["username"],
+             first_name=data["isim"],
+             last_name=data["soyisim"],
+             email=request.user.email)
 
-        u.set_password(data["password"])
+    u.set_password(data["password"])
+    try:
         u.save()
         u.save(using=u.email)
-
-        data["user"] = u.id
-        serializer = StudentSerializer(data=data)
-        s = AccountSerializer(data=data)
-
-        if s.is_valid():
-            s.save()
-
-        if serializer.is_valid():
-            serializer.save()
-
-        token = Token.objects.create(user=u)
-
     except BaseException as e:
         return Response({"success": "False", "error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    data["user"] = u.id
+    serializer = StudentSerializer(data=data)
+    s = AccountSerializer(data=data)
+
+    if s.is_valid():
+        s.save()
+
+    if serializer.is_valid():
+        serializer.save()
+
+    token = Token.objects.create(user=u)
 
     return Response({"success": "true",
                      "username": u.username,
@@ -102,8 +99,7 @@ def öğrencial(request, no):
         serializer = StudentSerializer(student)
         data = serializer.data.copy()
         data = dict(data)
-        data["username"] = User.objects.using(request.user.email).get(id=student.user.id).username
-        # öğrenciden userı alabiliyoruz
+        data["username"] = student.user.username
 
         return Response(data)
 
@@ -117,7 +113,7 @@ def öğrencial(request, no):
 @permission_classes([IsAuthenticated])
 def öğrenciprogramlarınıoluştur(request):
     u = request.user
-    sınıflar = []  # basically, to show which classes was created
+    sınıflar = []  # basically, to show in response which classes were created
     syllabuses = ÖğretmendProgramı.objects.using(u.email).all()
     ÖğrencidProgramı.objects.using(u.email).all().delete()
     for syl in syllabuses:
@@ -168,13 +164,3 @@ def dersprogramlarınıal(request, sınıf):
     data.update({j: eval(data[j]) for j in liste})
 
     return Response(data)
-
-# try:
-#     student = Öğrenci.objects.get(no=no)
-#     serializer = StudentSerializer(student)
-#     return Response(serializer.data)
-#
-# except BaseException as e:
-#     return Response({"success": "false", "error": str(e)}, status=status.HTTP_404_NOT_FOUND)
-#
-# Öğrenci.objects.filter(user__email="izeğitim")

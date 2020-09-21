@@ -80,15 +80,14 @@ def loginUser(request):
 
         k = "admin" if u.is_superuser else "öğretmen" if u.is_staff else "öğrenci"
 
-        token = Token.objects.filter(user_id=u.id).first()
         u.last_login = timezone.localtime()
         u.save(update_fields=['last_login'])
 
+        token = Token.objects.filter(user_id=u.id).first()
         if token:
             return Response({"username": u.username, "token": token.key, "statü": k})
 
         token = Token.objects.create(user=u)
-
         return Response({"username": u.username, "token": token.key, "statü": k})
 
     except BaseException as e:

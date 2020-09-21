@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
@@ -6,21 +5,13 @@ from rest_framework.decorators import permission_classes, authentication_classes
 from rest_framework import status
 from .models import Muhasebe
 from .serializer import AccountSerializer
-from student.models import Öğrenci
-from teacher.models import Öğretmen
-from datetime import datetime
-from collections import OrderedDict
-import collections
 import time
 from datetime import date
 import locale
-locale.setlocale(locale.LC_TIME, "tr")
+locale.setlocale(locale.LC_TIME, "tr_TR")
 
 
 # Create your views here.
-
-# decoder = json.JSONDecoder(object_pairs_hook=collections.OrderedDict)
-
 
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
@@ -137,39 +128,3 @@ def güncelle(request):
     data = serializer.data
     data["ödeme_geçmişi"] = eval(data["ödeme_geçmişi"])
     return Response(data)
-
-
-# kalan_taksit_adedi = taksit_adedi - ödenen // taksit
-# taksit - ödenen % taksit
-# data = request.data
-# m = Muhasebe.objects.filter(user_id=data["user"]).first()
-# json = eval(m.ödeme_geçmişi)
-# toplam = 0
-# for i in json.values():
-#     toplam += i
-#
-# if m.taksit * m.taksit_adedi > toplam:
-#     # m.ödenen_miktar += data["ödenen"]
-#     # json = eval(m.ödeme_geçmişi)
-#     json[time.strftime("%a, %d %b %Y %H:%M:%S")] = data["ödenen"]
-#
-#     toplam = 0
-#     for i in json.values():
-#         toplam += i
-#     m.ödenen_miktar = toplam
-#     m.ödeme_geçmişi = str(json).replace('"', "'")
-#     data = request.data
-#     m = Muhasebe.objects.filter(user_id=data["user"]).first()
-#     json = eval(m.ödeme_geçmişi)
-#     ödenen_miktar = 0
-#     for i in json.values():
-#         ödenen_miktar += i
-#
-#     if m.taksit * m.taksit_adedi > ödenen_miktar:
-#         json[time.strftime("%a, %d %b %Y %H:%M:%S")] = data["ödenen"]
-#         m.save()
-#         ödenen_miktar = 0
-#         for i in json.values():
-#             ödenen_miktar += i
-#
-#         m.ödenen_miktar = ödenen_miktar

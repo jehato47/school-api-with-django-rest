@@ -1,6 +1,7 @@
 from rest_framework import permissions
 
 
+# todo: Gereken yerlere ekle
 class Issuperuser(permissions.BasePermission):
     message = {"success": False, "error": "Yönetici Değilsiniz"}
 
@@ -10,6 +11,7 @@ class Issuperuser(permissions.BasePermission):
         return False
 
 
+# todo: Gereken yerlere ekle
 class Isstaff(permissions.BasePermission):
     message = {"success": False, "error": "Öğretmen Değilsiniz"}
 
@@ -19,6 +21,7 @@ class Isstaff(permissions.BasePermission):
         return False
 
 
+# todo: Gereken yerlere ekle
 class HaveData(permissions.BasePermission):
     message = {"success": False, "error": "Veri Göndermelisiniz"}
 

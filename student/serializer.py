@@ -8,7 +8,6 @@ class StudentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        # obj = Öğretmen.objects.using(validated_data["user"].email).create(**validated_data)
         obj = Öğrenci(**validated_data)
         obj.save(using=validated_data["user"].email)
 

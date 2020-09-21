@@ -3,10 +3,11 @@ from .views import *
 
 
 urlpatterns = [
-    # path('attendance/<slug:d>/<slug:ders>/<int:no>', yoklamayıal),
+    # Öğrenci
     path('addstudent', registerStudent),
     path('class/<int:id>', öğrencilerial),
     path('student/<int:no>', öğrencial),
+    # Ders Programı
     path('getsyl/<int:sınıf>', dersprogramlarınıal),
     path('upsyl', öğrenciprogramlarınıoluştur)
 ]
