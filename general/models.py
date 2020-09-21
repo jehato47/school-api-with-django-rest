@@ -13,6 +13,7 @@ class Duyuru(models.Model):
     oluşturan = models.CharField(max_length=30)
     içerik = models.TextField()
     tarih = models.DateTimeField(auto_now_add=True)
+    to = models.CharField(max_length=10, default="666666")
     dosya = models.FileField(null=True, validators=[file_control])
 
     class Meta:
