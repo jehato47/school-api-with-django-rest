@@ -22,7 +22,7 @@ class Öğretmen(models.Model):
     tel = models.CharField(max_length=15)
     ders = models.CharField(max_length=20)
     etüt_saatleri = models.TextField()
-    profil_foto = models.FileField(null=True ,validators=[file_control])
+    profil_foto = models.FileField(null=True, default="default.jpg", validators=[file_control])
 
     class Meta:
         verbose_name_plural = "Öğretmenler"

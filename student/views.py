@@ -1,15 +1,14 @@
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from teacher.serializer import *
 from accountancy.serializer import AccountSerializer
 from .serializer import *
 # from teacher.models import *
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from djangorest.permission import Issuperuser, Isstaff
+from djangorest.permission import Issuperuser, Isstaff, HaveData
 from collections import OrderedDict
 
 liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
@@ -19,8 +18,7 @@ liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "
 
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated, Issuperuser])
+@permission_classes([IsAuthenticated, Issuperuser, HaveData])
 def registerStudent(request):
     data = request.data
     data = dict(data)
@@ -78,7 +76,6 @@ def registerStudent(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated, Isstaff])
 def öğrencilerial(request, id):
     students = Öğrenci.objects.using(request.user.email).filter(sınıf=id, user__email=request.user.email)
@@ -90,8 +87,7 @@ def öğrencilerial(request, id):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff])
 def öğrencial(request, no):
     student = Öğrenci.objects.using(request.user.email).filter(no=no).first()
 
@@ -109,8 +105,7 @@ def öğrencial(request, no):
 
 # >----- Ders Programı -----<
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser])
 def öğrenciprogramlarınıoluştur(request):
     u = request.user
     sınıflar = []  # basically, to show in response which classes were created
@@ -142,7 +137,8 @@ def öğrenciprogramlarınıoluştur(request):
     data = serializer.data
     for i in data:
         for j in liste:
-            i["sınıf"] = int(i["sınıf"])
+            # i["sınıf"] = int(i["sınıf"])
+            # If the name of classes are in the form of "119" this statement will be used
             i[j] = eval(i[j])
     return Response({"success": True,
                      "message": "Öğrenci Ders Programları Oluşturuldu",
@@ -151,7 +147,6 @@ def öğrenciprogramlarınıoluştur(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def dersprogramlarınıal(request, sınıf):
     s = ÖğrencidProgramı.objects.using(request.user.email).filter(sınıf=sınıf).first()

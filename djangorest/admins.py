@@ -44,8 +44,8 @@ class BeskalemAdmin(admin.ModelAdmin):
 
 
 beskalem = admin.AdminSite('beskalem')
-for i in liste:
-    beskalem.register(i, BeskalemAdmin)
+# for i in liste:
+#     beskalem.register(i, BeskalemAdmin)
 
 
 # ---- Admin panel for iz database ----
@@ -76,5 +76,5 @@ class IzAdmin(admin.ModelAdmin):
 
 
 iz = admin.AdminSite('iz')
-for i in liste:
-    iz.register(i, IzAdmin)
+# for i in liste:
+#     iz.register(i, IzAdmin)

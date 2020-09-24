@@ -1,12 +1,11 @@
 from django.contrib.auth.models import User
 # from django.shortcuts import get_object_or_404, get_list_or_404
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 # from django.views.decorators.csrf import csrf_protect
 from .serializer import *
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from djangorest.permission import *
 from .models import *
@@ -16,7 +15,6 @@ from datetime import *
 from student.models import Öğrenci, ÖğrencidProgramı
 from student.serializer import *
 from twilio.rest import Client
-from collections import OrderedDict
 
 liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
 
@@ -25,8 +23,7 @@ liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "
 
 # >----- Öğretmen -----<
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated, Issuperuser])
+@permission_classes([IsAuthenticated, Issuperuser, HaveData])
 def registerTeacher(request):
     try:
         data = request.data
@@ -72,8 +69,7 @@ def registerTeacher(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated, Issuperuser])
+@permission_classes([IsAuthenticated])
 def öğretmenal(request, id):
     teacher = Öğretmen.objects.using(request.user.email).filter(user_id=id).first()
 
@@ -101,11 +97,9 @@ def öğretmenal(request, id):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def dersegöreöğretmenal(request, ders):
     e_date = (datetime.today() - timedelta(days=datetime.today().weekday() % 7)).date()
-
     t = Öğretmen.objects.using(request.user.email).filter(ders=ders)
 
     if not t:
@@ -133,8 +127,7 @@ def dersegöreöğretmenal(request, ders):
 
 # >----- Ders Programı -----<
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated, HaveData])
+@permission_classes([IsAuthenticated, Issuperuser, HaveData])
 def dersprogramıekle(request):
     data = request.data
     u = request.user
@@ -168,8 +161,7 @@ def dersprogramıekle(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff])
 def dersprogramınıal(request, id):
     s = ÖğretmendProgramı.objects.using(request.user.email).filter(user_id=id).first()
     if not s:

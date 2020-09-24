@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-# Create your models here.
 
 
 def file_control(value):  # add this to some file where you can import it from
@@ -14,7 +13,7 @@ class Duyuru(models.Model):
     içerik = models.TextField()
     tarih = models.DateTimeField(auto_now_add=True)
     to = models.CharField(max_length=10, default="666666")
-    dosya = models.FileField(null=True, validators=[file_control])
+    dosya = models.FileField(null=True, blank=True, validators=[file_control])
 
     class Meta:
         verbose_name_plural = "Duyurular"

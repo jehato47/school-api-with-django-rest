@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import permission_classes, authentication_classes, api_view
 from rest_framework import status
+from djangorest.permission import Issuperuser, Isstaff, HaveData
 from .models import Muhasebe
 from .serializer import AccountSerializer
 import time
@@ -14,8 +14,7 @@ locale.setlocale(locale.LC_TIME, "tr_TR")
 # Create your views here.
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser, HaveData])
 def ödemekayıt(request):
     data = request.data
     s = AccountSerializer(data=data)
@@ -26,8 +25,7 @@ def ödemekayıt(request):
 
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser, HaveData])
 def ödemeal(request):
     data = request.data
     m = Muhasebe.objects.using(request.user.email).filter(user_id=data["user"]).first()
@@ -79,8 +77,7 @@ def ödemeal(request):
 
 
 @api_view(["PATCH"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser, HaveData])
 def güncelle(request):
     data = request.data
     m = Muhasebe.objects.using(request.user.email).filter(user_id=data["user"]).first()

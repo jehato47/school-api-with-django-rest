@@ -1,10 +1,9 @@
 from django.contrib.auth.models import User
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from teacher.serializer import TeacherSerializer
 from .serializer import *
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from djangorest.permission import *
 from datetime import *
@@ -16,7 +15,6 @@ liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "
 
 # >----- Yoklama -----<
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated, Isstaff])
 def yoklama(request):
     data = request.data
@@ -47,10 +45,8 @@ def yoklama(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated, Isstaff])
 def yoklamayıal(request, d, ders, no):
-
     x = date(*list(map(int, d.split("-"))))
     y = Yoklama.objects.using(request.user.email).filter(date=x, ders=ders, sınıf=no).first()
     if not y:
@@ -67,8 +63,7 @@ def yoklamayıal(request, d, ders, no):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser])
 def yoklamalarıal(request):
     y = Yoklama.objects.using(request.user.email).all().order_by("date")
     serializer = AttendanceSerializer(y, many=True)
@@ -81,7 +76,6 @@ def yoklamalarıal(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def sınıfyoklamalarınıal(request, no):
     y = Yoklama.objects.using(request.user.email).filter(sınıf=no).order_by("date")
@@ -96,8 +90,7 @@ def sınıfyoklamalarınıal(request, no):
 
 # >----- Etüt -----<
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser])
 def etütekle(request):
     # ******
     etüt = lambda k: str({x: {} for x in k})
@@ -154,8 +147,7 @@ def etütekle(request):
 
 
 @api_view(["PUT"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsAuthenticated, Issuperuser])
 def etütgüncelle(request):
     e_date = (datetime.today() - timedelta(days=datetime.today().weekday() % 7)).date()
     data = request.data
@@ -197,8 +189,7 @@ def etütgüncelle(request):
 
 
 @api_view(["PUT"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsAuthenticated, Issuperuser])
 def etütsaatlerigüncelle(request, id):
     data = request.data
 
@@ -216,8 +207,7 @@ def etütsaatlerigüncelle(request, id):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff])
 def etütal(request, id):
     u = User.objects.using(request.user.email).filter(id=id).first()
 
@@ -242,17 +232,19 @@ def etütal(request, id):
 
 # >----- Ödev -----<
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([HaveData, IsAuthenticated, Isstaff])
+@permission_classes([IsAuthenticated, Isstaff])
 def ödev_oluştur(request):
     u = request.user
     t = Öğretmen.objects.using(u.email).filter(user_id=u.id).first()
     if not t:
         return Response({"success": False, "error": "Böyle bir öğretmen yok"},
                         status=status.HTTP_404_NOT_FOUND)
-    data = request.data
+    data = dict(request.data)
+    for i in data:
+        data[i] = data[i][0]
     data["ders"] = t.ders
     data["öğretmen"] = u.get_full_name()
+    data["teacher_image"] = t.profil_foto.url
 
     hw = Ödev.objects.using(u.email).filter(öğretmen=data["öğretmen"],
                                             ders=data["ders"],
@@ -281,7 +273,6 @@ def ödev_oluştur(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def ödevleri_al(request, sınıf):
     hw = Ödev.objects.using(request.user.email).filter(sınıf=sınıf).order_by("başlangıç_tarihi")
@@ -294,8 +285,7 @@ def ödevleri_al(request, sınıf):
 
 
 @api_view(["PUT"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff])
 def ödev_güncelle(request, id):
     data = request.data
     hw = Ödev.objects.using(request.user.email).filter(id=id).first()
@@ -316,8 +306,7 @@ def ödev_güncelle(request, id):
 
 
 @api_view(["DELETE"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff])
 def ödev_sil(request, id):
     hw = Ödev.objects.using(request.user.email).filter(id=id).first()
 

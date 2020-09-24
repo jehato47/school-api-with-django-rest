@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -39,8 +40,16 @@ class Yoklama(models.Model):
         return "{} {}".format(self.ders, self.date)
 
 
+def file_control(value):  # add this to some file where you can import it from
+    limit = 25 * 1024 * 1024
+    if value.size > limit:
+        raise ValidationError('Dosya çok büyük. 25 mb tan küçük olmalı')
+
+
 class Ödev(models.Model):
     öğretmen = models.CharField(max_length=30)
+    teacher_image = models.TextField(null=True, blank=True)
+    dosya = models.FileField(null=True, blank=True, validators=[file_control])
     ders = models.CharField(max_length=20)
     sınıf = models.IntegerField()
     başlangıç_tarihi = models.DateField(auto_now_add=True)

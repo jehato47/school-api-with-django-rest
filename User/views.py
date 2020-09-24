@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from student.models import Öğrenci
 from management.serializer import EtudeSerializer
 from student.serializer import StudentSerializer
@@ -11,9 +11,8 @@ from administrator.serializer import YöneticiSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from djangorest.permission import Issuperuser, Isstaff
+from djangorest.permission import Issuperuser
 from datetime import *
 from django.utils import timezone
 
@@ -22,7 +21,6 @@ e_date = (datetime.today() - timedelta(days=datetime.today().weekday() % 7)).dat
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def userInfo(request):
     user = request.user
@@ -56,8 +54,8 @@ def userInfo(request):
             data = serializer.data
             data["sınavsonuçları"] = eval(data["sınavsonuçları"])
 
-        k = "admin" if user.is_superuser else "öğretmen" if user.is_staff else "öğrenci"
-        data["statü"] = k
+        k = "admin" if user.is_superuser else "teacher" if user.is_staff else "student"
+        data["position"] = k
         data["username"] = User.objects.using(user.email).get(id=u.user_id).username
         data["user"] = u.user_id
 
@@ -78,24 +76,23 @@ def loginUser(request):
             return Response({"success": False, "error": "Kullanıcı Adı veya Şifre Hatalı"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        k = "admin" if u.is_superuser else "öğretmen" if u.is_staff else "öğrenci"
+        k = "admin" if u.is_superuser else "teacher" if u.is_staff else "student"
 
         u.last_login = timezone.localtime()
         u.save(update_fields=['last_login'])
 
         token = Token.objects.filter(user_id=u.id).first()
         if token:
-            return Response({"username": u.username, "token": token.key, "statü": k})
+            return Response({"username": u.username, "token": token.key, "position": k})
 
         token = Token.objects.create(user=u)
-        return Response({"username": u.username, "token": token.key, "statü": k})
+        return Response({"username": u.username, "token": token.key, "position": k})
 
     except BaseException as e:
         return Response({"success": "False", "error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def logoutUser(request):
     token = Token.objects.get(user_id=request.user.id)
@@ -104,8 +101,7 @@ def logoutUser(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser])
 def searchuser(request):
     keyword = request.GET.get("keyword")
     öğretmenmi = int(request.GET.get("t"))
@@ -142,7 +138,6 @@ def searchuser(request):
 
 
 @api_view(["DELETE"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated, Issuperuser])
 def deleteUser(request):
     id = request.data["user"]

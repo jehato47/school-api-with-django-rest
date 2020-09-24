@@ -3,9 +3,8 @@ from .serializer import *
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from djangorest.permission import Issuperuser, Isstaff
+from djangorest.permission import Issuperuser, Isstaff, HaveData
 from .models import *
 from student.models import Öğrenci
 from twilio.rest import Client
@@ -28,8 +27,7 @@ def index(request):
 # <QueryDict: {'içerik': ['bugün yeni bir deneme sınavı yapılacak']}>
 # {'içerik': 'bugün yeni bir deneme sınavı yapılacak'}
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff, HaveData])
 def duyuruoluştur(request):
     u = request.user
     data = dict(request.data)
@@ -45,7 +43,6 @@ def duyuruoluştur(request):
 
 
 @api_view(["GET"])
-@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def genelduyurularıal(request, to):
     duyurular = Duyuru.objects.using(request.user.email).filter(to=to).order_by("tarih")
@@ -53,9 +50,9 @@ def genelduyurularıal(request, to):
     return Response(serializer.data)
 
 
+# todo: Duyuru gönderen kişi sadece kendi duyurusunu silebilsin
 @api_view(["DELETE"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff])
 def duyurusil(request, id):
     n = Duyuru.objects.using(request.user.email).filter(id=id).first()
     if not n:
@@ -67,9 +64,9 @@ def duyurusil(request, id):
                     status=status.HTTP_204_NO_CONTENT)
 
 
+# todo: Dosyayı sadece duyuruyu gönderen kişi silebilsin
 @api_view(["DELETE"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Isstaff])
 def dosyaları_sil(request, id):
     n = Duyuru.objects.using(request.user.email).filter(id=id).first()
     if not n or not n.dosya:
@@ -80,8 +77,7 @@ def dosyaları_sil(request, id):
 
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser])
 def mesaj_gönder(request, no, t):
     client = Client(account_sid, auth_token)
     s = Öğrenci.objects.using(request.user.email).filter(no=no).first()
@@ -109,8 +105,7 @@ def mesaj_gönder(request, no, t):
 
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, Issuperuser, HaveData])
 def özelmesajgönder(request, t):
     client = Client(account_sid, auth_token)
     data = request.data
