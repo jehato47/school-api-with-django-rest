@@ -15,6 +15,9 @@ from djangorest.permission import Issuperuser
 @permission_classes([IsAuthenticated, Issuperuser])
 def registerAdmin(request):
     data = request.data
+    data = dict(data)
+    data.update({i: data[i][0] or None for i in data})
+
     serializer = YöneticiSerializer(data=data)
     data["user"] = 1
     if serializer.is_valid():

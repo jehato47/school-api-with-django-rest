@@ -52,6 +52,7 @@ class Ödev(models.Model):
     dosya = models.FileField(null=True, blank=True, validators=[file_control])
     ders = models.CharField(max_length=20)
     sınıf = models.IntegerField()
+    şube = models.CharField(max_length=10, null=True)
     başlangıç_tarihi = models.DateField(auto_now_add=True)
     bitiş_tarihi = models.DateField()
     başlık = models.TextField()

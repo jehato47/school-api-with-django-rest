@@ -217,7 +217,7 @@ def etütal(request, id):
 
     e = u.etüt_set.all().order_by("date")
     if not e:
-        err = u.first_name.capitalize()+" hocaya ait etüt bulunamadı"
+        err = u.first_name.capitalize() + " hocaya ait etüt bulunamadı"
         return Response({"success": False,
                          "error": err},
                         status=status.HTTP_404_NOT_FOUND)
@@ -240,12 +240,12 @@ def ödev_oluştur(request):
         return Response({"success": False, "error": "Böyle bir öğretmen yok"},
                         status=status.HTTP_404_NOT_FOUND)
     data = dict(request.data)
-    for i in data:
-        data[i] = data[i][0]
+    data.update({i: data[i][0] or None for i in data})
     data["ders"] = t.ders
     data["öğretmen"] = u.get_full_name()
     data["teacher_image"] = t.profil_foto.url
 
+    # todo : update_or_create metodunu kullan
     hw = Ödev.objects.using(u.email).filter(öğretmen=data["öğretmen"],
                                             ders=data["ders"],
                                             içerik=data["içerik"],
@@ -275,7 +275,8 @@ def ödev_oluştur(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def ödevleri_al(request, sınıf):
-    hw = Ödev.objects.using(request.user.email).filter(sınıf=sınıf).order_by("başlangıç_tarihi")
+    sınıf, şube = sınıf.split("-")
+    hw = Ödev.objects.using(request.user.email).filter(sınıf=sınıf, şube=şube).order_by("başlangıç_tarihi")
     serializer = HomeworkSerializer(hw, many=True)
     data = serializer.data
     for i in data:

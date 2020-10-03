@@ -72,7 +72,7 @@ class ÖdevAdminBeskalem(admin.ModelAdmin):
 
 
 class YoklamaAdminBeskalem(admin.ModelAdmin):
-    using = "beksalem"
+    using = "beskalem"
     list_display = ["öğretmen", "ders", "date", "gelenler", "gelmeyenler"]
     list_display_links = ["öğretmen"]
     list_filter = ["ders", "date"]

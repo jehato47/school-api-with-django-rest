@@ -28,8 +28,7 @@ def registerTeacher(request):
     try:
         data = request.data
         data = dict(data)
-        for i in data:
-            data[i] = data[i][0] or None
+        data.update({i: data[i][0] or None for i in data})
 
         data["etüt_saatleri"] = str(data["etüt_saatleri"])
         serializer = TeacherSerializer(data=data, context={"request": request})
@@ -74,12 +73,11 @@ def öğretmenal(request, id):
     teacher = Öğretmen.objects.using(request.user.email).filter(user_id=id).first()
 
     if teacher:
-        u = User.objects.using(request.user.email).get(id=id)
         serializer = TeacherSerializer(teacher, context={"request": request})
         data = serializer.data.copy()
         data = dict(data)
-        data["username"] = u.username
-        data["kurum"] = u.email
+        data["username"] = teacher.user.username
+        data["kurum"] = teacher.user.email
         data["etüt_saatleri"] = eval(data["etüt_saatleri"])
         e = Etüt.objects.using(request.user.email).filter(user_id=id).first()
         if e:

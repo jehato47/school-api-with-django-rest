@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'accountancy',
     'general',
     'management',
+    'exam',
     'twilio',
 ]
 

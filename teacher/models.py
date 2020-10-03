@@ -21,7 +21,7 @@ class Öğretmen(models.Model):
     email = models.EmailField(max_length=100)
     tel = models.CharField(max_length=15)
     ders = models.CharField(max_length=20)
-    etüt_saatleri = models.TextField()
+    etüt_saatleri = models.TextField(default="{}", null=True, blank=True)
     profil_foto = models.FileField(null=True, default="default.jpg", validators=[file_control])
 
     class Meta:

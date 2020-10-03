@@ -14,7 +14,7 @@ urlpatterns = [
     path('upetuthours/<int:id>', etütsaatlerigüncelle),
     # Ödev
     path('addhw', ödev_oluştur),
-    path('gethw/<int:sınıf>', ödevleri_al),
+    path('gethw/<slug:sınıf>', ödevleri_al),
     path('uphw/<int:id>', ödev_güncelle),
     path('delhw/<int:id>', ödev_sil)
 ]

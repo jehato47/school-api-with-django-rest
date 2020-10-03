@@ -1,16 +1,16 @@
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from .serializer import *
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from djangorest.permission import Issuperuser, Isstaff, HaveData
+from djangorest import pyr
 from .models import *
 from student.models import Öğrenci
-from twilio.rest import Client
 import os
 from twilio.rest import Client
-from twilio.http.http_client import TwilioHttpClient
+from datetime import date
 
 account_sid = os.environ.get("ACCOUNT_SID")
 auth_token = os.environ.get("AUTH_TOKEN")
@@ -24,15 +24,12 @@ def index(request):
     return render(request, "index.html")
 
 
-# <QueryDict: {'içerik': ['bugün yeni bir deneme sınavı yapılacak']}>
-# {'içerik': 'bugün yeni bir deneme sınavı yapılacak'}
 @api_view(["POST"])
 @permission_classes([IsAuthenticated, Isstaff, HaveData])
 def duyuruoluştur(request):
     u = request.user
     data = dict(request.data)
-    for i in data:
-        data[i] = data[i][0] or None
+    data.update({i: data[i][0] or None for i in data})
     data["oluşturan"] = u.get_full_name()
 
     serializer = NoticeSerializer(data=data, context={"request": request})
@@ -129,3 +126,22 @@ def özelmesajgönder(request, t):
                      "to": to,
                      "body": body,
                      "sid": m.sid})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated, Issuperuser])
+def veritabanıyedekle(request):
+    db = request.user.email
+    pos = "{}.sqlite3".format(db)
+    poc = "{}/{}/{}.sqlite3".format(db, date.today(), db)
+    pyr.upload(poc=poc, pos=pos)
+
+    return Response({"success": True, "message": "Veri tabanınız sisteme yedeklendi"})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def veritabanlarınıal(request):
+    db = request.user.email
+    dbs = pyr.get(db)
+    return Response({"success": True, "liste": dbs})

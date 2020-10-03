@@ -19,7 +19,8 @@ urlpatterns = [
     path("adm/", include("administrator.urls")),
     path("acc/", include("accountancy.urls")),
     path("general/", include("general.urls")),
-    path("manage/", include("management.urls"))
+    path("manage/", include("management.urls")),
+    path("exam/", include("exam.urls"))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

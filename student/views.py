@@ -22,8 +22,7 @@ liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "
 def registerStudent(request):
     data = request.data
     data = dict(data)
-    for i in data:
-        data[i] = data[i][0] or None
+    data.update({i: data[i][0] or None for i in data})
 
     serializer = StudentSerializer(data=data)
     s = AccountSerializer(data=data)
@@ -77,8 +76,13 @@ def registerStudent(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, Isstaff])
-def öğrencilerial(request, id):
-    students = Öğrenci.objects.using(request.user.email).filter(sınıf=id, user__email=request.user.email)
+def öğrencilerial(request, sınıf):
+    if sınıf.__contains__("-"):
+        sınıf, şube = sınıf.split("-")
+        students = Öğrenci.objects.using(request.user.email).filter(sınıf=sınıf, şube=şube)
+    else:
+        students = Öğrenci.objects.using(request.user.email).filter(sınıf=sınıf)
+
     if not students:
         return Response({"success": False, "error": "Böyle bir sınıf yok la"},
                         status=status.HTTP_404_NOT_FOUND)

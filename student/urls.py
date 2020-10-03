@@ -6,7 +6,7 @@ from .views import *
 urlpatterns = [
     # Öğrenci
     path('addstudent', registerStudent),
-    path('class/<slug:id>', öğrencilerial),
+    path('class/<slug:sınıf>', öğrencilerial),
     path('student/<int:no>', öğrencial),
     # Ders Programı
     path('getsyl/<slug:sınıf>', dersprogramlarınıal),

@@ -3,6 +3,7 @@ from djangorest.admins import beskalem, iz, BeskalemAdmin
 from .models import Duyuru
 # todo : model admin save_on_top = True oldu
 # todo : User modelindeki emailfield charfield oldu
+# todo : User modelindeki email'in verbose name -> (_('Kurum')) oldu
 
 
 class DuyuruAdminBeskalem(admin.ModelAdmin):
