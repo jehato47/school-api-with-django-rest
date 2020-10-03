@@ -52,9 +52,8 @@ def userInfo(request):
             u = Öğrenci.objects.using(user.email).filter(user_id=user.id).first()
             serializer = StudentSerializer(u)
             data = serializer.data
-            data["sınavsonuçları"] = eval(data["sınavsonuçları"])
 
-        k = "admin" if user.is_superuser else "teacher" if user.is_staff else "student"
+        k = "admin" if user.is_superuser else "öğretmen" if user.is_staff else "öğrenci"
         data["position"] = k
         data["username"] = User.objects.using(user.email).get(id=u.user_id).username
         data["user"] = u.user_id
@@ -76,7 +75,7 @@ def loginUser(request):
             return Response({"success": False, "error": "Kullanıcı Adı veya Şifre Hatalı"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        k = "admin" if u.is_superuser else "teacher" if u.is_staff else "student"
+        k = "admin" if u.is_superuser else "öğretmen" if u.is_staff else "öğrenci"
 
         u.last_login = timezone.localtime()
         u.save(update_fields=['last_login'])
