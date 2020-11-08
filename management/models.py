@@ -47,16 +47,17 @@ def file_control(value):  # add this to some file where you can import it from
 
 
 class Ödev(models.Model):
-    öğretmen = models.CharField(max_length=30)
+    ogretmen = models.CharField(max_length=30)
     teacher_image = models.TextField(null=True, blank=True)
     dosya = models.FileField(null=True, blank=True, validators=[file_control])
     ders = models.CharField(max_length=20)
-    sınıf = models.IntegerField()
-    şube = models.CharField(max_length=10, null=True)
-    başlangıç_tarihi = models.DateField(auto_now_add=True)
-    bitiş_tarihi = models.DateField()
-    başlık = models.TextField()
-    içerik = models.TextField()
+    sinif = models.IntegerField()
+    sube = models.CharField(max_length=10, null=True)
+    baslangic_tarihi = models.DateField(auto_now_add=True)
+    bitis_tarihi = models.DateField()
+    baslik = models.TextField()
+    icerik = models.TextField()
+    aciklama = models.TextField()
     yapanlar = models.TextField(default="[]")
     yapmayanlar = models.TextField(default="[]")
 
@@ -64,4 +65,4 @@ class Ödev(models.Model):
         verbose_name_plural = "Ödevler"
 
     def __str__(self):
-        return self.içerik
+        return self.icerik

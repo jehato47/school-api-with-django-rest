@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 
 
 def file_control(value):  # add this to some file where you can import it from
-    types = ["png", "jpg", "jpeg"]
+    types = ["png", "jpg", "jpeg", "img", ]
     ext = value.name.split(".")[-1]
     if not (ext in types):
         raise ValidationError('Resim dosyası gönderdiğinizden emin olun')

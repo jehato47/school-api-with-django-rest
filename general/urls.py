@@ -11,6 +11,6 @@ urlpatterns = [
     path('delnot/<int:id>', duyurusil),
     path('delfile/<int:id>', dosyaları_sil),
     # Veri Tabanı
-    path('backup', veritabanıyedekle),
-    path('getbackups', veritabanlarınıal)
+    # path('backup', veritabanıyedekle),
+    # path('getbackups', veritabanlarınıal)
 ]

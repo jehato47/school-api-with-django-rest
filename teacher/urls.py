@@ -9,5 +9,6 @@ urlpatterns = [
     path('gettbylec/<slug:ders>', dersegöreöğretmenal),
     # Ders Programı
     path('addsyl', dersprogramıekle),
-    path('getsyl/<slug:id>', dersprogramınıal)
+    path('getsyl/<slug:id>', dersprogramınıal),
+    path('getpr', derslerial)
 ]

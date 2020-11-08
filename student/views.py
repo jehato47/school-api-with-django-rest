@@ -10,6 +10,8 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from djangorest.permission import Issuperuser, Isstaff, HaveData
 from collections import OrderedDict
+from exam.models import OkulSınav
+from exam.serializer import ExamSerializer
 
 liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
 
@@ -163,3 +165,7 @@ def dersprogramlarınıal(request, sınıf):
     data.update({j: eval(data[j]) for j in liste})
 
     return Response(data)
+
+
+
+

@@ -207,7 +207,7 @@ def etütsaatlerigüncelle(request, id):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, Isstaff])
+@permission_classes([IsAuthenticated])
 def etütal(request, id):
     u = User.objects.using(request.user.email).filter(id=id).first()
 
@@ -242,18 +242,19 @@ def ödev_oluştur(request):
     data = dict(request.data)
     data.update({i: data[i][0] or None for i in data})
     data["ders"] = t.ders
-    data["öğretmen"] = u.get_full_name()
+    data["ogretmen"] = u.get_full_name()
+
     data["teacher_image"] = t.profil_foto.url
 
     # todo : update_or_create metodunu kullan
-    hw = Ödev.objects.using(u.email).filter(öğretmen=data["öğretmen"],
+    hw = Ödev.objects.using(u.email).filter(ogretmen=data["ogretmen"],
                                             ders=data["ders"],
-                                            içerik=data["içerik"],
-                                            başlık=data["başlık"],
-                                            bitiş_tarihi=data["bitiş_tarihi"]).first()
+                                            icerik=data["icerik"],
+                                            baslik=data["baslik"],
+                                            bitis_tarihi=data["bitis_tarihi"]).first()
 
-    serializer = HomeworkSerializer(hw)
     if hw:
+        serializer = HomeworkSerializer(hw)
         data = serializer.data
         data["yapanlar"] = eval(data["yapanlar"])
         data["yapmayanlar"] = eval(data["yapmayanlar"])
@@ -276,7 +277,7 @@ def ödev_oluştur(request):
 @permission_classes([IsAuthenticated])
 def ödevleri_al(request, sınıf):
     sınıf, şube = sınıf.split("-")
-    hw = Ödev.objects.using(request.user.email).filter(sınıf=sınıf, şube=şube).order_by("başlangıç_tarihi")
+    hw = Ödev.objects.using(request.user.email).filter(sinif=sınıf, sube=şube).order_by("baslangic_tarihi")
     serializer = HomeworkSerializer(hw, many=True)
     data = serializer.data
     for i in data:

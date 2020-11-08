@@ -49,8 +49,8 @@ def registerTeacher(request):
 
         u.save()
         u.save(using=u.email)
-
         data["user"] = u.id
+        print(data)
         serializer = TeacherSerializer(data=data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
@@ -171,5 +171,13 @@ def dersprogramınıal(request, id):
     data.update({j: eval(data[j]) for j in liste})
 
     return Response(data)
+
+
+@api_view(["GET"])
+def derslerial(request):
+    t = Öğretmen.objects.using("beskalem").all()
+    dersler = [i.ders for i in t]
+
+    return Response(set(dersler))
 
 # u1.öğrenci_set.filter(no=132).first().sınavsonuçları

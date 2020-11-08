@@ -29,3 +29,13 @@ class HaveData(permissions.BasePermission):
         if request.data:
             return True
         return False
+
+
+class OnlyTeacher(permissions.BasePermission):
+    message = {"success": False, "error": "Öğretmen değilsiniz"}
+
+    def has_permission(self, request, view):
+        u = request.user
+        if u.is_staff and not u.is_superuser:
+            return True
+        return False

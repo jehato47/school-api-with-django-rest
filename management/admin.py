@@ -40,10 +40,10 @@ class EtütAdminBeskalem(admin.ModelAdmin):
 
 class ÖdevAdminBeskalem(admin.ModelAdmin):
     using = "beskalem"
-    list_display = ["içerik", "öğretmen", "sınıf", "başlangıç_tarihi"]
-    list_display_links = ["içerik"]
-    list_filter = ["sınıf", "öğretmen"]
-    search_fields = ["içerik", "öğretmen"]
+    list_display = ["baslik", "ogretmen", "sinif", "baslangic_tarihi"]
+    list_display_links = ["baslik"]
+    list_filter = ["sinif", "ogretmen"]
+    search_fields = ["icerik", "ogretmen"]
 
     def save_model(self, request, obj, form, change):
         # Tell Django to save objects to the 'other' database.
@@ -146,10 +146,10 @@ class EtütAdminIz(admin.ModelAdmin):
 
 class ÖdevAdminIz(admin.ModelAdmin):
     using = "iz"
-    list_display = ["içerik", "öğretmen", "sınıf", "başlangıç_tarihi"]
-    list_display_links = ["içerik"]
-    list_filter = ["sınıf", "öğretmen"]
-    search_fields = ["içerik", "öğretmen"]
+    list_display = ["baslik", "ogretmen", "sinif", "baslangic_tarihi"]
+    list_display_links = ["baslik"]
+    list_filter = ["sinif", "ogretmen"]
+    search_fields = ["icerik", "ogretmen"]
 
     def save_model(self, request, obj, form, change):
         # Tell Django to save objects to the 'other' database.

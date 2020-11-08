@@ -5,11 +5,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from djangorest.permission import Issuperuser, Isstaff, HaveData
-from djangorest import pyr
+# from djangorest import pyr
 from .models import *
 from student.models import Öğrenci
 import os
 from twilio.rest import Client
+from twilio.http.http_client import TwilioHttpClient
 from datetime import date
 
 account_sid = os.environ.get("ACCOUNT_SID")
@@ -128,20 +129,20 @@ def özelmesajgönder(request, t):
                      "sid": m.sid})
 
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated, Issuperuser])
-def veritabanıyedekle(request):
-    db = request.user.email
-    pos = "{}.sqlite3".format(db)
-    poc = "{}/{}/{}.sqlite3".format(db, date.today(), db)
-    pyr.upload(poc=poc, pos=pos)
-
-    return Response({"success": True, "message": "Veri tabanınız sisteme yedeklendi"})
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def veritabanlarınıal(request):
-    db = request.user.email
-    dbs = pyr.get(db)
-    return Response({"success": True, "liste": dbs})
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated, Issuperuser])
+# def veritabanıyedekle(request):
+#     db = request.user.email
+#     pos = "{}.sqlite3".format(db)
+#     poc = "{}/{}/{}.sqlite3".format(db, date.today(), db)
+#     pyr.upload(poc=poc, pos=pos)
+#
+#     return Response({"success": True, "message": "Veri tabanınız sisteme yedeklendi"})
+#
+#
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def veritabanlarınıal(request):
+#     db = request.user.email
+#     dbs = pyr.get(db)
+#     return Response({"success": True, "liste": dbs})
