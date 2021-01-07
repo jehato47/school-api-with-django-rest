@@ -165,7 +165,3 @@ def dersprogramlarınıal(request, sınıf):
     data.update({j: eval(data[j]) for j in liste})
 
     return Response(data)
-
-
-
-

@@ -147,7 +147,7 @@ def etütekle(request):
 
 
 @api_view(["PUT"])
-@permission_classes([IsAuthenticated, IsAuthenticated, Issuperuser])
+@permission_classes([IsAuthenticated, Issuperuser])
 def etütgüncelle(request):
     e_date = (datetime.today() - timedelta(days=datetime.today().weekday() % 7)).date()
     data = request.data
@@ -241,9 +241,9 @@ def ödev_oluştur(request):
                         status=status.HTTP_404_NOT_FOUND)
     data = dict(request.data)
     data.update({i: data[i][0] or None for i in data})
+
     data["ders"] = t.ders
     data["ogretmen"] = u.get_full_name()
-
     data["teacher_image"] = t.profil_foto.url
 
     # todo : update_or_create metodunu kullan

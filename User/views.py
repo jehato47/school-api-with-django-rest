@@ -65,8 +65,10 @@ def userInfo(request):
     return Response(data, status=status.HTTP_200_OK)
 
 
-@api_view(["POST"])
+@api_view(["POST", "GET"])
 def loginUser(request):
+    if request.method == "GET":
+        return Response("Kullanıcı adı ve şifrenizi giriniz")
     try:
         data = request.data
         u = authenticate(username=data["username"], password=data["password"])
