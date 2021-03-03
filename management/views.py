@@ -176,7 +176,7 @@ def etütgüncelle(request):
     x.sort(key=int)
 
     y = {k: (data["etüt"][k] if k in list(data["etüt"]) else o[k]) for k in x}
-
+    
     d = e.__dict__
     d[gün] = y
 

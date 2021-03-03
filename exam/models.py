@@ -21,3 +21,15 @@ class OkulSınav(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class ExcelForm(models.Model):
+    file = models.FileField(verbose_name="file")
+    sınıf = models.IntegerField()
+    şube = models.CharField(max_length=10)
+
+    class Meta:
+        verbose_name_plural = "Excel Form"
+
+    def __str__(self):
+        return self.file.name

@@ -154,7 +154,7 @@ def öğrenciprogramlarınıoluştur(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def dersprogramlarınıal(request, sınıf):
+def dersprogramlarınıal(request, sınıf, şube):
     s = ÖğrencidProgramı.objects.using(request.user.email).filter(sınıf=sınıf).first()
     if not s:
         return Response({"success": False, "error": "Bu sınıfa ait ders programı bulunamadı"},
