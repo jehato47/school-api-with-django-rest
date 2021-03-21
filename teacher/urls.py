@@ -10,5 +10,6 @@ urlpatterns = [
     # Ders Programı
     path('addsyl', dersprogramıekle),
     path('getsyl/<slug:id>', dersprogramınıal),
-    path('getpr', derslerial)
+    path('getpr', derslerial),
+    path('gtclss', öğretmeningirdiğisınıflarıal)
 ]

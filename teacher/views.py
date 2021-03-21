@@ -15,6 +15,9 @@ from datetime import *
 from student.models import Öğrenci, ÖğrencidProgramı
 from student.serializer import *
 from twilio.rest import Client
+import locale
+
+locale.setlocale(locale.LC_ALL, 'tr_TR')
 
 liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
 
@@ -145,6 +148,7 @@ def dersprogramıekle(request):
 
     # s = ÖğretmendProgramı(**data)
     # s.save(using=u.email)
+
     data.update({k: str(data[k]) for k in liste if k in data})
     serializer = TSyllabusSerializer(data=data)
     if serializer.is_valid():
@@ -181,3 +185,20 @@ def derslerial(request):
     return Response(set(dersler))
 
 # u1.öğrenci_set.filter(no=132).first().sınavsonuçları
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def öğretmeningirdiğisınıflarıal(request):
+    u = request.user
+
+    dp = ÖğretmendProgramı.objects.using(u.email).filter(user=u).first()
+    dp = dp.__dict__
+
+    day = datetime.today().strftime("%A").lower()
+    dp = eval(dp[day])
+
+    dp = {dp[i]: [i] for i in dp}
+
+    print(sorted(dp))
+    return Response(dp)

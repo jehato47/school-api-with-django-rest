@@ -9,6 +9,6 @@ urlpatterns = [
     path('class/<slug:sınıf>', öğrencilerial),
     path('student/<int:no>', öğrencial),
     # Ders Programı
-    path('getsyl/<slug:sınıf>/<slug:şube>', dersprogramlarınıal),
+    path('getsyl/<slug:sınıf>', dersprogramlarınıal),
     path('upsyl', öğrenciprogramlarınıoluştur)
 ]

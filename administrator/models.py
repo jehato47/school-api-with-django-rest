@@ -21,6 +21,7 @@ class Yönetici(models.Model):
     email = models.EmailField(max_length=30)
     mevki = models.CharField(max_length=30)
     profil_foto = models.FileField(null=True, default="default.jpg", validators=[file_control])
+    kayıttarihi = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Yöneticiler"

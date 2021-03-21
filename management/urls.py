@@ -5,8 +5,10 @@ urlpatterns = [
     # Yoklama
     path('addattendance', yoklama),
     path('attendance', yoklamalarıal),
-    path('attendance/<slug:d>/<slug:ders>/<int:no>', yoklamayıal),
-    path('attendance/<int:no>', sınıfyoklamalarınıal),
+    path('attendance/<slug:d>/<slug:ders>/<slug:saat>/<slug:sınıf>', yoklamayıal),
+    path('attendance/<slug:sınıf>', sınıfyoklamalarınıal),
+    path('getallclss', tümsınıflarıal),
+    path('getnrstatlist', enyakınyoklamayıal),
     # Etüt
     path('addet', etütekle),
     path('getset/<slug:id>', etütal),

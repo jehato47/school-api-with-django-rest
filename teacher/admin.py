@@ -9,8 +9,8 @@ liste = [beskalem, iz]
 
 class ÖğretmenAdminBeskalem(admin.ModelAdmin):
     using = "beskalem"
-    list_display = ["isim", "soyisim", "email", "tel", "ders"]
-    list_display_links = ["isim"]
+    list_display = ["user", "user_id", "isim", "soyisim", "ders"]
+    list_display_links = ["user", "isim"]
     search_fields = ["isim", "soyisim"]
     list_filter = ["isim", "ders"]
 
@@ -42,8 +42,8 @@ class ÖğretmenAdminBeskalem(admin.ModelAdmin):
 
 class ÖğretmenAdminIz(admin.ModelAdmin):
     using = "iz"
-    list_display = ["isim", "soyisim", "email", "tel", "ders"]
-    list_display_links = ["isim"]
+    list_display = ["user", "user_id", "isim", "soyisim", "ders"]
+    list_display_links = ["user", "isim"]
     search_fields = ["isim", "soyisim"]
     list_filter = ["isim", "ders"]
 

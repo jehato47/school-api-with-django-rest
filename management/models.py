@@ -25,13 +25,16 @@ class Etüt(models.Model):
 
 
 class Yoklama(models.Model):
+    user = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True)
     date = models.DateField()
     ders = models.CharField(max_length=15)
     gelenler = models.CharField(max_length=300)
     gelmeyenler = models.CharField(max_length=300)
-    sınıf = models.IntegerField(blank=False)
+    izinliler = models.CharField(max_length=300)
+    geç_gelenler = models.CharField(max_length=300)
+    sınıf = models.CharField(max_length=20, blank=False)
     öğretmen = models.CharField(max_length=30)
-    dersaralığı = models.CharField(max_length=10)
+    derssaati = models.CharField(max_length=10)
 
     class Meta:
         verbose_name_plural = "Yoklamalar"

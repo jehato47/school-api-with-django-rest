@@ -18,9 +18,11 @@ liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "
 @permission_classes([IsAuthenticated, Isstaff])
 def yoklama(request):
     data = request.data
-
+    data["user"] = request.user.id
     data["gelenler"] = str(data["gelenler"])
     data["gelmeyenler"] = str(data["gelmeyenler"])
+    data["izinliler"] = str(data["izinliler"])
+    data["geç_gelenler"] = str(data["geç_gelenler"])
     data["öğretmen"] = request.user.get_full_name()
     data["kurum"] = request.user.email
 
@@ -28,7 +30,7 @@ def yoklama(request):
 
     y = Yoklama.objects.using(request.user.email).filter(date=data["date"],
                                                          ders=data["ders"],
-                                                         dersaralığı=data["dersaralığı"],
+                                                         derssaati=data["derssaati"],
                                                          sınıf=data["sınıf"])
     if y:
         y.delete()
@@ -39,6 +41,8 @@ def yoklama(request):
         data = serializer.data
         data["gelenler"] = eval(data["gelenler"])
         data["gelmeyenler"] = eval(data["gelmeyenler"])
+        data["izinliler"] = eval(data["izinliler"])
+        data["geç_gelenler"] = eval(data["geç_gelenler"])
 
         return Response(data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_201_CREATED)
@@ -46,9 +50,15 @@ def yoklama(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, Isstaff])
-def yoklamayıal(request, d, ders, no):
+def yoklamayıal(request, d, ders, saat, sınıf):
+
     x = date(*list(map(int, d.split("-"))))
-    y = Yoklama.objects.using(request.user.email).filter(date=x, ders=ders, sınıf=no).first()
+    y = Yoklama.objects.using(request.user.email).filter(date=x,
+                                                         ders=ders,
+                                                         derssaati=saat,
+                                                         sınıf=sınıf,
+                                                         ).first()
+    print(x, ders, saat, sınıf)
     if not y:
         return Response({"success": False,
                          "error": "Bugüne ve derse ait yoklama bulunamadı"},
@@ -59,6 +69,9 @@ def yoklamayıal(request, d, ders, no):
     data = serializer.data
     data["gelenler"] = eval(data["gelenler"])
     data["gelmeyenler"] = eval(data["gelmeyenler"])
+    data["izinliler"] = eval(data["izinliler"])
+    data["geç_gelenler"] = eval(data["geç_gelenler"])
+
     return Response(data)
 
 
@@ -71,21 +84,79 @@ def yoklamalarıal(request):
     for i in data:
         i["gelenler"] = eval(i["gelenler"])
         i["gelmeyenler"] = eval(i["gelmeyenler"])
+        i["izinliler"] = eval(i["izinliler"])
+        i["geç_gelenler"] = eval(i["geç_gelenler"])
 
     return Response(data)
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def sınıfyoklamalarınıal(request, no):
-    y = Yoklama.objects.using(request.user.email).filter(sınıf=no).order_by("date")
+def sınıfyoklamalarınıal(request, sınıf):
+    y = Yoklama.objects.using(request.user.email).filter(sınıf=sınıf).order_by("date")
     serializer = AttendanceSerializer(y, many=True)
     data = serializer.data
     for i in data:
         i["gelenler"] = eval(i["gelenler"])
         i["gelmeyenler"] = eval(i["gelmeyenler"])
+        i["izinliler"] = eval(i["izinliler"])
+        i["geç_gelenler"] = eval(i["geç_gelenler"])
 
     return Response(data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def tümsınıflarıal(request):
+    u = request.user
+    sınıflar = Yoklama.objects.using(u.email).all().values("sınıf")
+    sınıflar = [i["sınıf"] for i in sınıflar]
+
+    return Response(set(sınıflar))
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def enyakınyoklamayıal(request):
+    u = request.user
+    # Todo : Burayı tamamla
+    now = datetime.now()
+    day = now.strftime("%A").lower()
+
+    dp = list(ÖğretmendProgramı.objects.using(u.email).filter(user=u).values(day))
+
+    sözlük = {}
+    # now = datetime(now.year, now.month, 17, 10, 0)
+
+    for i in dp:
+        for j in eval(i[day]):
+            saat, dakika = j.split(".")
+
+            dt = datetime(now.year, now.month, now.day, int(saat), int(dakika))
+            k = dt - now
+
+            if k.days >= 0:
+                sözlük[dt - now] = "{} {}".format(eval(i[day])[j], j)
+
+    if len(sözlük) == 0:
+        return Response({"success": True, "message": "Yakın zamanlı dersininiz bulunmamaktadır"})
+
+    sınıf = sözlük[min(sözlük)]
+    return Response({"success": True, "sınıf": sınıf})
+    # if sınıf.__contains__("-"):
+    #     sınıf, şube = sınıf.split("-")
+    #     students = Öğrenci.objects.using(request.user.email).filter(sınıf=sınıf, şube=şube)
+    # else:
+    #     students = Öğrenci.objects.using(request.user.email).filter(sınıf=sınıf)
+    #
+    # if not students:
+    #     return Response({"success": False, "error": "Böyle bir sınıf yok la"},
+    #                     status=status.HTTP_404_NOT_FOUND)
+    # serializer = StudentSerializer(students, many=True)
+    # return Response(serializer.data)
+    # print(dp)
+    # return Response(sınıf)
+    # pass
 
 
 # >----- Etüt -----<
@@ -147,7 +218,7 @@ def etütekle(request):
 
 
 @api_view(["PUT"])
-@permission_classes([IsAuthenticated, Issuperuser])
+@permission_classes([IsAuthenticated])
 def etütgüncelle(request):
     e_date = (datetime.today() - timedelta(days=datetime.today().weekday() % 7)).date()
     data = request.data

@@ -23,6 +23,7 @@ class Öğretmen(models.Model):
     ders = models.CharField(max_length=20)
     etüt_saatleri = models.TextField(default="{}", null=True, blank=True)
     profil_foto = models.FileField(null=True, default="default.jpg", validators=[file_control])
+    kayıttarihi = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Öğretmenler"

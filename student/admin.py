@@ -6,8 +6,8 @@ from djangorest.admins import beskalem, iz
 
 class ÖğrenciAdminBeskalem(admin.ModelAdmin):
     using = "beskalem"
-    list_display = ["isim", "soyisim", "email", "no", "sınıf"]
-    list_display_links = ["isim"]
+    list_display = ["user", "user_id", "isim", "soyisim", "no", "sınıf", "şube"]
+    list_display_links = ["user", "user_id"]
     search_fields = ["isim", "soyisim"]
     list_filter = ["sınıf", "isim", "soyisim"]
 
@@ -41,8 +41,8 @@ class ÖğrenciAdminBeskalem(admin.ModelAdmin):
 
 class ÖğrenciAdminIz(admin.ModelAdmin):
     using = "iz"
-    list_display = ["isim", "soyisim", "email", "no", "sınıf"]
-    list_display_links = ["isim"]
+    list_display = ["user", "user_id", "isim", "soyisim", "no", "sınıf", "şube"]
+    list_display_links = ["user", "user_id"]
     search_fields = ["isim", "soyisim"]
     list_filter = ["sınıf", "isim", "soyisim"]
 

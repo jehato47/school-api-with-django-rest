@@ -101,7 +101,7 @@ def öğrencial(request, no):
         serializer = StudentSerializer(student)
         data = serializer.data.copy()
         data = dict(data)
-        data["username"] = student.user.username
+        data["username"] = student.user.username if student.user is not None else "deleted"
 
         return Response(data)
 
@@ -154,7 +154,7 @@ def öğrenciprogramlarınıoluştur(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def dersprogramlarınıal(request, sınıf, şube):
+def dersprogramlarınıal(request, sınıf):
     s = ÖğrencidProgramı.objects.using(request.user.email).filter(sınıf=sınıf).first()
     if not s:
         return Response({"success": False, "error": "Bu sınıfa ait ders programı bulunamadı"},

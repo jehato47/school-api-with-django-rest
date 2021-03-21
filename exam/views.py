@@ -74,7 +74,7 @@ def excelOluştur(request, clss: str):
 
         students = Öğrenci.objects.using(u.email).filter(sınıf=s, şube=ş).values_list("isim", "soyisim", "sınıf", "şube", "no")
         df = pd.DataFrame(students, columns=["İsim", "Soyisim", "Sınıf", "Şube", "No"])
-        df["Not"] = "..."
+        df["Not"] = ""
         df["Sınav"] = 1
         dff = pd.concat([dff, df])
         print(dff)

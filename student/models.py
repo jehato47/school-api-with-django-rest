@@ -15,8 +15,8 @@ def file_control(value):  # add this to some file where you can import it from
 
 
 class Öğrenci(models.Model):
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
-    sınıf = models.IntegerField(null=False, blank=False)
+    user = models.ForeignKey("auth.User", on_delete=models.SET_NULL, null=True)
+    sınıf = models.CharField(max_length=10, null=False, blank=False)
     şube = models.CharField(max_length=10, null=True)
     isim = models.CharField(max_length=100)
     soyisim = models.CharField(max_length=100)
@@ -25,6 +25,7 @@ class Öğrenci(models.Model):
     tel = models.CharField(max_length=20, null=True, blank=True)
     veli_tel = models.CharField(max_length=20)
     profil_foto = models.FileField(default="default.jpg", null=True, validators=[file_control])
+    kayıttarihi = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Öğrenciler"
