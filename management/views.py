@@ -9,6 +9,8 @@ from djangorest.permission import *
 from datetime import *
 from .models import *
 from teacher.models import *
+from student.models import Öğrenci
+from student.serializer import StudentSerializer
 
 liste = ["pazartesi", "salı", "çarşamba", "perşembe", "cuma", "cumartesi", "pazar"]
 
@@ -51,18 +53,12 @@ def yoklama(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, Isstaff])
 def yoklamayıal(request, d, ders, saat, sınıf):
+    u = request.user
 
-    x = date(*list(map(int, d.split("-"))))
-    y = Yoklama.objects.using(request.user.email).filter(date=x,
-                                                         ders=ders,
-                                                         derssaati=saat,
-                                                         sınıf=sınıf,
-                                                         ).first()
-    print(x, ders, saat, sınıf)
+    y = Yoklama.objects.using(u.email).filter(user=u, derssaati=saat, date=d).first()
     if not y:
         return Response({"success": False,
-                         "error": "Bugüne ve derse ait yoklama bulunamadı"},
-                        status=status.HTTP_404_NOT_FOUND)
+                         "error": "Bu tarihe ve sınıfa ait ders programı bulunamadı"})
 
     serializer = AttendanceSerializer(y)
 
@@ -73,6 +69,119 @@ def yoklamayıal(request, d, ders, saat, sınıf):
     data["geç_gelenler"] = eval(data["geç_gelenler"])
 
     return Response(data)
+
+
+# Todo : Buranın aşırı karışmasının sebebi birçok şeyi tek requestte almam
+# Todo : Bu istisnai bir durum
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def yoklamayıaldetaylı(request, d, s, snf):
+    u = request.user
+    t = Öğretmen.objects.using(u.email).filter(user=u).first()
+    if not t:
+        return Response({"success": False, "message": "Böyle bir öğretmen yok"})
+    # Todo : Burayı tamamla
+    # print(date(d.split("-")))
+
+    dp = ÖğretmendProgramı.objects.using(u.email).filter(user=u).first()
+    dp = dp.__dict__
+
+    day = datetime.today().strftime("%A").lower()
+    dp = eval(dp[day])
+
+    dp = {dp[i]: [i] for i in dp}
+
+    if d != "0" or s != "0":
+        # date = d.split("-")
+        datee = [int(i) for i in d.split("-")]
+        timee = [int(i) for i in s.split("-")]
+        datee = datetime(*datee, *timee)
+        sınıf = "{} {}".format(snf, s)
+        snf, şb = snf.split("-")
+        students = Öğrenci.objects.using(u.email).filter(sınıf=snf, şube=şb)
+        sserializer = StudentSerializer(students, many=True)
+
+        y = Yoklama.objects.using(u.email).filter(user=u, date=d, derssaati=s).first()
+        if y:
+            yserializer = AttendanceSerializer(y)
+            y = {
+                "gelenler": eval(yserializer.data["gelenler"]),
+                "gelmeyenler": eval(yserializer.data["gelmeyenler"]),
+                "izinliler": eval(yserializer.data["izinliler"]),
+                "geç_gelenler": eval(yserializer.data["geç_gelenler"]),
+            }
+
+        else:
+            y = {
+                "gelenler": [],
+                "gelmeyenler": [],
+                "izinliler": [],
+                "geç_gelenler": [],
+            }
+            [y["gelmeyenler"].append(i.no) for i in students]
+        numaralar = []
+        for i in y.values():
+            numaralar.extend(i)
+        print(numaralar)
+        [y["gelmeyenler"].append(i.no) for i in students if not (i.no in numaralar)]
+        return Response({"success": True, "sınıf": sınıf,
+                         "öğrenciler": sserializer.data,
+                         "dp": dp,
+                         "date": datee,
+                         "yoklama": y})
+
+    else:
+        now = datetime.now()
+        day = now.strftime("%A").lower()
+        dersprogramı = list(ÖğretmendProgramı.objects.using(u.email).filter(user=u).values(day))
+        sözlük = {}
+
+        for i in dersprogramı:
+            for j in eval(i[day]):
+                saat, dakika = j.split("-")
+
+                dt = datetime(now.year, now.month, now.day, int(saat), int(dakika))
+                k = dt - now
+
+                if k.days >= 0:
+                    sözlük[dt - now] = "{} {}".format(eval(i[day])[j], j)
+
+        if len(sözlük) == 0:
+            return Response({"success": False, "message": "Yakın zamanlı dersininiz bulunmamaktadır", "dp": dp})
+
+        sınıfşubezaman = sözlük[min(sözlük)]
+        sınıf, saat = sınıfşubezaman.split(" ")
+        sınıf, şube = sınıf.split("-")
+
+        students = Öğrenci.objects.using(u.email).filter(sınıf=sınıf, şube=şube)
+        serializer = StudentSerializer(students, many=True)
+
+        y = Yoklama.objects.using(u.email).filter(user=u, derssaati=saat, date=date.today()).first()
+
+        if y:
+            yserializer = AttendanceSerializer(y)
+            y = {"gelenler": eval(yserializer.data["gelenler"]),
+                 "gelmeyenler": eval(yserializer.data["gelmeyenler"]),
+                 "izinliler": eval(yserializer.data["izinliler"]),
+                 "geç_gelenler": eval(yserializer.data["geç_gelenler"]),
+                 }
+        else:
+            y = {"gelenler": [],
+                 "gelmeyenler": [],
+                 "izinliler": [],
+                 "geç_gelenler": [],
+                 }
+            [y["gelmeyenler"].append(i.no) for i in students]
+        numaralar = []
+        for i in y.values():
+            numaralar.extend(i)
+        print(numaralar)
+        [y["gelmeyenler"].append(i.no) for i in students if not (i.no in numaralar)]
+        return Response({"success": True, "sınıf": sınıfşubezaman,
+                         "öğrenciler": serializer.data,
+                         "dp": dp,
+                         "date": now,
+                         "yoklama": y})
 
 
 @api_view(["GET"])
@@ -122,15 +231,12 @@ def enyakınyoklamayıal(request):
     # Todo : Burayı tamamla
     now = datetime.now()
     day = now.strftime("%A").lower()
-
     dp = list(ÖğretmendProgramı.objects.using(u.email).filter(user=u).values(day))
-
     sözlük = {}
-    # now = datetime(now.year, now.month, 17, 10, 0)
 
     for i in dp:
         for j in eval(i[day]):
-            saat, dakika = j.split(".")
+            saat, dakika = j.split("-")
 
             dt = datetime(now.year, now.month, now.day, int(saat), int(dakika))
             k = dt - now
@@ -141,22 +247,9 @@ def enyakınyoklamayıal(request):
     if len(sözlük) == 0:
         return Response({"success": True, "message": "Yakın zamanlı dersininiz bulunmamaktadır"})
 
-    sınıf = sözlük[min(sözlük)]
-    return Response({"success": True, "sınıf": sınıf})
-    # if sınıf.__contains__("-"):
-    #     sınıf, şube = sınıf.split("-")
-    #     students = Öğrenci.objects.using(request.user.email).filter(sınıf=sınıf, şube=şube)
-    # else:
-    #     students = Öğrenci.objects.using(request.user.email).filter(sınıf=sınıf)
-    #
-    # if not students:
-    #     return Response({"success": False, "error": "Böyle bir sınıf yok la"},
-    #                     status=status.HTTP_404_NOT_FOUND)
-    # serializer = StudentSerializer(students, many=True)
-    # return Response(serializer.data)
-    # print(dp)
-    # return Response(sınıf)
-    # pass
+    sınıfşubezaman = sözlük[min(sözlük)]
+
+    return Response({"success": True, "sınıf": sınıfşubezaman})
 
 
 # >----- Etüt -----<
@@ -247,7 +340,7 @@ def etütgüncelle(request):
     x.sort(key=int)
 
     y = {k: (data["etüt"][k] if k in list(data["etüt"]) else o[k]) for k in x}
-    
+
     d = e.__dict__
     d[gün] = y
 

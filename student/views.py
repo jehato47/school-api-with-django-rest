@@ -134,7 +134,7 @@ def öğrenciprogramlarınıoluştur(request):
 
                 studentsyl2[day] = eval(studentsyl2[day])
                 studentsyl2[day].update(studenthour)
-                ordered = OrderedDict(sorted(studentsyl2[day].items(), key=lambda x: float(x[0])))
+                ordered = OrderedDict(sorted(studentsyl2[day].items(), key=lambda x: x[0]))
                 studentsyl2[day] = dict(ordered)
                 studentsyl.save(using=request.user.email)
 

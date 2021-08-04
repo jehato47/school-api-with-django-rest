@@ -53,7 +53,7 @@ def registerTeacher(request):
         u.save()
         u.save(using=u.email)
         data["user"] = u.id
-        print(data)
+
         serializer = TeacherSerializer(data=data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
@@ -200,5 +200,4 @@ def öğretmeningirdiğisınıflarıal(request):
 
     dp = {dp[i]: [i] for i in dp}
 
-    print(sorted(dp))
     return Response(dp)

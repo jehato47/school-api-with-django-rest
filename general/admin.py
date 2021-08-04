@@ -8,7 +8,7 @@ from .models import Duyuru
 
 class DuyuruAdminBeskalem(admin.ModelAdmin):
     using = "beskalem"
-    list_display = ["oluşturan", "içerik", "tarih", "dosya"]
+    list_display = ["oluşturan", "içerik", "tarih", "to", "dosya"]
     list_display_links = ["oluşturan"]
     search_fields = ["oluşturan", "içerik"]
     list_filter = ["tarih"]
@@ -41,7 +41,7 @@ class DuyuruAdminBeskalem(admin.ModelAdmin):
 
 class DuyuruAdminIz(admin.ModelAdmin):
     using = "iz"
-    list_display = ["oluşturan", "içerik", "tarih", "dosya"]
+    list_display = ["oluşturan", "içerik", "tarih", "to", "dosya"]
     list_display_links = ["oluşturan"]
     search_fields = ["oluşturan", "içerik"]
     list_filter = ["tarih"]

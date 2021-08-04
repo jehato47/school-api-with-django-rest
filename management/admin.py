@@ -73,7 +73,7 @@ class ÖdevAdminBeskalem(admin.ModelAdmin):
 
 class YoklamaAdminBeskalem(admin.ModelAdmin):
     using = "beskalem"
-    list_display = ["öğretmen", "ders", "derssaati", "date", "gelenler", "gelmeyenler", "izinliler"]
+    list_display = ["öğretmen", "ders", "derssaati", "date", "sınıf", "gelenler", "gelmeyenler", "izinliler", "geç_gelenler"]
     list_display_links = ["öğretmen", "derssaati"]
     list_filter = ["ders", "date"]
     search_fields = ["ders", "öğretmen"]
@@ -179,7 +179,7 @@ class ÖdevAdminIz(admin.ModelAdmin):
 
 class YoklamaAdminIz(admin.ModelAdmin):
     using = "iz"
-    list_display = ["öğretmen", "ders", "derssaati", "date", "gelenler", "gelmeyenler"]
+    list_display = ["öğretmen", "ders", "derssaati", "date", "sınıf", "gelenler", "gelmeyenler", "izinliler", "geç_gelenler"]
     list_display_links = ["öğretmen", "derssaati"]
     list_filter = ["ders", "date"]
     search_fields = ["ders", "öğretmen"]

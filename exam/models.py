@@ -4,8 +4,10 @@ from django.db import models
 
 
 class OkulSınav(models.Model):
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
-    sınıf = models.IntegerField()
+    # user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    isim_soyisim = models.CharField(max_length=20)
+    no = models.IntegerField()
+    sınıf = models.CharField(max_length=20)
     şube = models.CharField(max_length=10)
     matematik = models.TextField(null=True, blank=True, default="{}")
     fizik = models.TextField(null=True, blank=True, default="{}")
@@ -20,12 +22,12 @@ class OkulSınav(models.Model):
         verbose_name_plural = "Okul Sınavları"
 
     def __str__(self):
-        return self.user.username
+        return self.isim_soyisim
 
 
 class ExcelForm(models.Model):
     file = models.FileField(verbose_name="file")
-    sınıf = models.IntegerField()
+    sınıf = models.CharField(max_length=10)
     şube = models.CharField(max_length=10)
 
     class Meta:

@@ -9,6 +9,7 @@ urlpatterns = [
     path('attendance/<slug:sınıf>', sınıfyoklamalarınıal),
     path('getallclss', tümsınıflarıal),
     path('getnrstatlist', enyakınyoklamayıal),
+    path('getattdtl/<slug:d>/<slug:s>/<slug:snf>', yoklamayıaldetaylı),
     # Etüt
     path('addet', etütekle),
     path('getset/<slug:id>', etütal),
