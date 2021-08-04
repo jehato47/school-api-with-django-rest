@@ -54,8 +54,8 @@ def yoklama(request):
 @permission_classes([IsAuthenticated, Isstaff])
 def yoklamayıal(request, d, ders, saat, sınıf):
     u = request.user
-
     y = Yoklama.objects.using(u.email).filter(user=u, derssaati=saat, date=d).first()
+
     if not y:
         return Response({"success": False,
                          "error": "Bu tarihe ve sınıfa ait ders programı bulunamadı"})
