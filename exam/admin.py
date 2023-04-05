@@ -2,6 +2,7 @@ from django.contrib import admin
 from.models import OkulSınav, ExcelForm
 from djangorest.admins import beskalem, iz, BeskalemAdmin, IzAdmin
 
+admin.register(OkulSınav, ExcelForm, admin.ModelAdmin)
 
 class ExamAdminBeskalem(admin.ModelAdmin):
     using = "beskalem"
