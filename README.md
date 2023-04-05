@@ -1,1 +1,1 @@
-# sexy-school-api-with-django-rest
+# school-api-with-django-rest
