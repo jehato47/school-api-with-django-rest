@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'management',
     'exam',
     'twilio',
+    'drf_yasg',
 ]
 
 
